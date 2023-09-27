@@ -95,7 +95,7 @@ int main(int charc, char** charv){
     for(int i=n-1; i>1; i--)
     {
         float sum = solveValues[order[i]];
-        for(int k=i+1; k<n; i++)
+        for(int k=i+1; k<n; k++)
             sum = sum - coeffiecientArray[order[i]][k] * output[k];
         
         output[i] = sum / coeffiecientArray[order[i]][i];
