@@ -1,4 +1,9 @@
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+
+#include <vector>
 
 void printMatrix(float **matrix, int rows, int cols) 
 {
@@ -18,11 +23,172 @@ void printArray(float *arr, int cols)
     std::cout << std::endl;
 }
 
-int main(int charc, char** charv){
+void printArray(int *arr, int cols) 
+{
+    std::cout << "ARRAY: " << "\n";
+    for (int j = 0; j < cols; j++) 
+        std::cout << arr[j] << " ";
+    std::cout << std::endl;
+}
 
-    int n = 5;
-    float **coeffiecientArray = new float*[n];
-    float *solveValues = new float[n];
+bool isPureNumber(const std::string str)
+{
+    for(int i = 0; i < str.length(); i++ )
+    {
+        char c = str.at(i);
+        if(c < 48 || c >57)
+            return false;
+    }
+        
+    return true;
+}
+
+bool isNegativeNumber(const std::string str)
+{
+    if(str.empty())
+        return false;
+    return (str[0] == '-') && (str.find_first_not_of("1234567890", 1) == std::string::npos);
+}
+
+int getUserEquationCount()
+{
+
+    std::string input;
+    do
+    {
+        std::cout << "How many equations will you be inputing?" << std::endl;
+        std::getline(std::cin, input);
+        std::cout << std::endl;
+    } 
+    while( !isPureNumber(input) );
+    
+    return stoi(input);
+}
+
+bool stringIsValid(std::string str)
+{
+    return true;
+}
+
+std::vector<std::string> manualRows(int rows)
+{
+    std::vector<std::string> stringArray;
+
+    for(int i=0; i<rows; i++)
+    {
+        std::cout << " >";
+        std::string in;
+        std::getline(std::cin, in, '\n');
+        if(!stringIsValid(in))
+            exit(1);
+        stringArray.push_back(in);
+        
+    }
+
+    return stringArray;
+}
+
+std::vector<std::string> fromFile(int rows)
+{
+
+    std::vector<std::string> stringArray;
+    std::string input;
+    std::cout << "Enter file path:" << std::endl;
+    std::getline(std::cin, input, '\n');
+
+    std::ifstream inputFile(input);
+
+    if(inputFile.is_open())
+    {
+        std::string activeString;
+        for(int i=0; i<rows; i++)
+        {
+            std::getline(inputFile, activeString);
+            if(!stringIsValid(activeString))
+                exit(1);
+            stringArray.push_back(activeString);
+        }
+        inputFile.close();
+        return stringArray;
+    }
+    exit(1);
+}
+
+std::vector<std::string> getUserInput(int eCount)
+{
+    int val = -1;
+    std::string input;
+    do
+    {
+        do
+        {
+            std::cout << "Would you like to either:" << std::endl;
+            std::cout << "0) Manualy Enter Row Coefficient" << std::endl;
+            std::cout << "1) Give the path for a formatted text file." << std::endl;
+            std::getline(std::cin, input);
+        }
+        while(!isPureNumber(input) || input.length() > 1);
+        val = stoi(input);
+    } while(val != 0 && val != 1);
+    
+    if(val == 0)
+        return manualRows(eCount);
+    else
+        return fromFile(eCount);
+
+}
+
+std::vector<std::string> splitString(const std::string& str)
+{
+    std::istringstream stream(str);
+    std::vector<std::string> splits;
+
+    do
+    {
+        std::string active;
+        stream >> active;
+        if(active != "")
+            splits.push_back(active);
+    } 
+    while (stream);
+    
+    return splits;
+}
+
+int setupCoeffiecientAndBMatrix(float** matrix, float* bmatrix, std::vector<std::string> stringArrays)
+{
+    int matrixLength = splitString( stringArrays.at(0) ) .size() - 1; 
+
+    for(int i=0; i<stringArrays.size(); i++)
+    {
+        matrix[i] = new float[matrixLength];
+
+        std::string active = stringArrays[i] ;
+        std::vector<std::string> activeSplitString = splitString( active );
+
+        for(int j=0; j<matrixLength; j++)
+        {
+            if(isPureNumber(activeSplitString[j]) || isNegativeNumber(activeSplitString[j]))
+                matrix[i][j] = stof(activeSplitString[j]);
+            else
+                exit(1); // ERROR
+        }
+        if(isPureNumber(activeSplitString[matrixLength]) || isNegativeNumber(activeSplitString[matrixLength]) )
+            bmatrix[i] = stof( activeSplitString[matrixLength] );
+        else
+            exit(1); // ERROR
+    }
+    return matrixLength;
+}
+
+float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
+{
+    float xMultiplier=0;
+    float r =0;
+    float rMax =0;
+    float sMax = 0;
+    int n = mLength;
+
     float *scaleFactor = new float[n];
     int *order = new int[n];
     float *output = new float[n];
@@ -32,32 +198,31 @@ int main(int charc, char** charv){
         output[i] = 0;
         scaleFactor[i] = 0;
         order[i] = i;
-        coeffiecientArray[i] = new float[n];
-
-        solveValues[i] = (rand() % 100) + 1;
-        for(int j=0; j<n; j++)
-            coeffiecientArray[i][j] = (rand() % 100) + 2;
-
     }
-    printMatrix(coeffiecientArray, n,n);
+    std::cout << "Initial -- " << std::endl;
+    printMatrix(matrix, n,n);
+    printArray(order, n);
+    std::cout << "Initial -- \n " << std::endl;
+    //SETUP DONE
 
-
-    float xMultiplier, r, rMax, sMax;
     int j=0;
     for(int i=0; i<n; i++)
     {
         sMax = 0;
-        for(int j=1; j<n; j++)
-            sMax = std::max(sMax,  std::abs(coeffiecientArray[i][j]));
+        for(j=0; j<n; j++)
+            sMax = std::max(sMax,  std::abs(matrix[i][j]));
         scaleFactor[i] = sMax;
     }
+    std::cout << "Scale Factor -- " << std::endl;
+    printArray(scaleFactor, n);
+    std::cout << "Scale Factor -- \n " << std::endl;
 
-    for(int k=1; k < n-1; k++)
+    for(int k=0; k < n-1; k++)
     {
-        
+        rMax = 0;
         for(int i=k; i<n; i++)
         {
-            r = coeffiecientArray[order[i]][k] / scaleFactor[order[i]];
+            r =  std::abs(matrix[ order[i] ][k] / scaleFactor[order[i]]);
             if (r > rMax)
             {
                 rMax = r;
@@ -71,38 +236,55 @@ int main(int charc, char** charv){
 
         for(int i=k+1; i<n; i++)
         {
-            xMultiplier = coeffiecientArray[i][k] / coeffiecientArray[k][k];
-            coeffiecientArray[i][k] = xMultiplier;
-
-            for(int j=k+1; j<n; j++)
-                coeffiecientArray[i][j] = coeffiecientArray[i][j] - (xMultiplier * coeffiecientArray[k][j]);
+            xMultiplier = matrix[ order[i] ][k] / matrix[ order[k] ][k];
             
-            solveValues[i] = solveValues[i] - (solveValues[k] * xMultiplier);
+            matrix[ order[i] ][k] = xMultiplier;
+
+            for(j=k+1; j<n; j++)
+                matrix[ order[i] ][j] = matrix[ order[i] ][j] - (xMultiplier * matrix[ order[k] ][j]);
         }
+        std::cout << "Matrix during step k=" << k << std::endl;
+        printMatrix(matrix, n,n);
+        std::cout << "ORDER during step k=" << k << std::endl;
+        printArray(order, n);
+        std::cout << " -- \n" << std::endl;
     }
 
-    printMatrix(coeffiecientArray, n,n);
-    printArray(solveValues, n);
-    printArray(scaleFactor, n);
-    
+    // BMatrix
+    for(int k=0; k<n-1; k++)
+        for(int i=k+1; i<n; i++)
+            bmatrix[order[i]] = bmatrix[order[i]] - (matrix[order[i]][k] * bmatrix[order[k]]);
 
-    for(int k =1; k<n-1; k++)
-        for(int i =k+1; i<n; i++)
-            solveValues[order[i]] = solveValues[order[i]] - (coeffiecientArray[order[k]][k] * solveValues[order[k]]);
+    output[n-1] = bmatrix[order[n-1]] / matrix[order[n-1]][n-1];
 
-    output[n-1] = solveValues[order[n-1]] / coeffiecientArray[order[n-1]][n-1];
-
-    for(int i=n-1; i>1; i--)
+    for(int i=n-1; i>=0; i--)
     {
-        float sum = solveValues[order[i]];
+        float sum = bmatrix[order[i]];
         for(int k=i+1; k<n; k++)
-            sum = sum - coeffiecientArray[order[i]][k] * output[k];
+            sum = sum - matrix[order[i]][k] * output[k];
         
-        output[i] = sum / coeffiecientArray[order[i]][i];
+        output[i] = sum / matrix[order[i]][i];
 
     }    
     
+    std::cout << "Xn values" << std::endl;
     printArray(output, n);
+    return output;
+}
 
+int main(int charc, char** charv)
+{
+
+    int equationCount = getUserEquationCount();
+
+    std::vector<std::string> input = getUserInput(equationCount);
+
+    float **coeffiecientMatrix = new float* [equationCount];
+    float *solveValues = new float[equationCount];
+    int matrixLength = setupCoeffiecientAndBMatrix(coeffiecientMatrix, solveValues, input);
+
+    float* outputs = gaussAndSolve(coeffiecientMatrix, solveValues, equationCount);
+
+    
 }
 
