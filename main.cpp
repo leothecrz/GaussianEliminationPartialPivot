@@ -1,9 +1,5 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
 
-#include <vector>
+#include "main.hpp"
 
 void printMatrix(float **matrix, int rows, int cols) 
 {
@@ -76,7 +72,7 @@ std::vector<std::string> manualRows(int rows)
 
     for(int i=0; i<rows; i++)
     {
-        std::cout << " >";
+        std::cout << "\n >";
         std::string in;
         std::getline(std::cin, in, '\n');
         if(!stringIsValid(in))
@@ -181,11 +177,12 @@ int setupCoeffiecientAndBMatrix(float** matrix, float* bmatrix, std::vector<std:
     return matrixLength;
 }
 
+//returned value must be deallocated by external source
 float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
 {
-    float xMultiplier=0;
-    float r =0;
-    float rMax =0;
+    float xMultiplier = 0;
+    float r = 0;
+    float rMax = 0;
     float sMax = 0;
     int n = mLength;
 
@@ -199,9 +196,10 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
         scaleFactor[i] = 0;
         order[i] = i;
     }
-    std::cout << "Initial -- " << std::endl;
+
+    std::cout << "\nInitial -- " << std::endl;
     printMatrix(matrix, n,n);
-    printArray(order, n);
+    printArray(bmatrix, n);
     std::cout << "Initial -- \n " << std::endl;
     //SETUP DONE
 
@@ -269,12 +267,15 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
     
     std::cout << "Xn values" << std::endl;
     printArray(output, n);
+
+    delete scaleFactor;
+    delete order;
+
     return output;
 }
 
 int main(int charc, char** charv)
 {
-
     int equationCount = getUserEquationCount();
 
     std::vector<std::string> input = getUserInput(equationCount);
@@ -285,6 +286,11 @@ int main(int charc, char** charv)
 
     float* outputs = gaussAndSolve(coeffiecientMatrix, solveValues, equationCount);
 
+    for(int i=0; i<equationCount; i++)
+        delete coeffiecientMatrix[i];
+    delete coeffiecientMatrix;
+    delete solveValues;
+    delete outputs;
     
 }
 
