@@ -48,8 +48,9 @@ bool isNegativeNumber(const std::string str)
 
 int getUserEquationCount()
 {
-
+    int stringnum = 0;
     std::string input;
+    do{
     do
     {
         std::cout << "How many equations will you be inputing?" << std::endl;
@@ -57,8 +58,11 @@ int getUserEquationCount()
         std::cout << std::endl;
     } 
     while( !isPureNumber(input) );
+    stringnum = stoi(input);
+    }
+    while(stringnum < 1);
     
-    return stoi(input);
+    return stringnum;
 }
 
 bool stringIsValid(std::string str)
@@ -66,9 +70,11 @@ bool stringIsValid(std::string str)
     return true;
 }
 
-std::vector<std::string> manualRows(int rows)
+std::pair< std::vector<std::string>, int> manualRows()
 {
     std::vector<std::string> stringArray;
+
+    int rows = getUserEquationCount();
 
     for(int i=0; i<rows; i++)
     {
@@ -81,10 +87,10 @@ std::vector<std::string> manualRows(int rows)
         
     }
 
-    return stringArray;
+    return std::pair(stringArray, rows);
 }
 
-std::vector<std::string> fromFile(int rows)
+std::pair< std::vector<std::string>, int> fromFile()
 {
 
     std::vector<std::string> stringArray;
@@ -97,20 +103,24 @@ std::vector<std::string> fromFile(int rows)
     if(inputFile.is_open())
     {
         std::string activeString;
-        for(int i=0; i<rows; i++)
+        int i = 0;
+        while(inputFile.peek() != EOF)
         {
             std::getline(inputFile, activeString);
             if(!stringIsValid(activeString))
                 exit(1);
             stringArray.push_back(activeString);
+            i++;
         }
         inputFile.close();
-        return stringArray;
+
+        return std::pair(stringArray, i);
     }
+    std::cout << "Failed To open file: " << input << std::endl;
     exit(1);
 }
 
-std::vector<std::string> getUserInput(int eCount)
+std::pair< std::vector<std::string>, int> getUserInput()
 {
     int val = -1;
     std::string input;
@@ -128,9 +138,9 @@ std::vector<std::string> getUserInput(int eCount)
     } while(val != 0 && val != 1);
     
     if(val == 0)
-        return manualRows(eCount);
+        return manualRows();
     else
-        return fromFile(eCount);
+        return fromFile();
 
 }
 
@@ -276,13 +286,13 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
 
 int main(int charc, char** charv)
 {
-    int equationCount = getUserEquationCount();
-
-    std::vector<std::string> input = getUserInput(equationCount);
+    //int equationCount = getUserEquationCount();
+    std::pair< std::vector<std::string>, int>  returnVals =  getUserInput();
+    int equationCount = returnVals.second;
 
     float **coeffiecientMatrix = new float* [equationCount];
     float *solveValues = new float[equationCount];
-    int matrixLength = setupCoeffiecientAndBMatrix(coeffiecientMatrix, solveValues, input);
+    int matrixLength = setupCoeffiecientAndBMatrix(coeffiecientMatrix, solveValues, returnVals.first);
 
     float* outputs = gaussAndSolve(coeffiecientMatrix, solveValues, equationCount);
 

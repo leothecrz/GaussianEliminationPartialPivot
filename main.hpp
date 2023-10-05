@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <utility>
 
 /**
  * @brief Function to print a 2D matrix
@@ -70,7 +71,7 @@ bool stringIsValid(std::string str) ;
  * @param rows 
  * @return std::vector<std::string> 
  */
-std::vector<std::string> manualRows(int rows) ; 
+std::pair< std::vector<std::string>, int> manualRows() ; 
 
 /**
  * @brief Function to get row coefficients from a file
@@ -79,15 +80,15 @@ std::vector<std::string> manualRows(int rows) ;
  * @param rows 
  * @return std::vector<std::string> 
  */
-std::vector<std::string> fromFile(int rows) ;
+std::pair< std::vector<std::string>, int> fromFile() ;
 
 /**
  * @brief Function to get user input for row coefficients
  * 
  * @param eCount 
- * @return std::vector<std::string> 
+ * @return std::pair< std::vector<std::string>, int> 
  */
-std::vector<std::string> getUserInput(int eCount) ;
+std::pair< std::vector<std::string>, int> getUserInput() ;
 
 /**
  * @brief Function to split a string into a vector of substrings
