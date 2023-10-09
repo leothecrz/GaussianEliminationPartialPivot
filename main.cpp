@@ -6,16 +6,17 @@ void printMatrix(float **matrix, int rows, int cols)
     std::cout << "Matrix: " << "\n";
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) 
-            std::cout << matrix[i][j] << " ";
-        std::cout << std::endl;
+            std::cout << matrix[i][j] << " | ";
+        std::cout << "\n";
     }
+    std::cout << std::endl;
 }
 
 void printArray(float *arr, int cols) 
 {
     std::cout << "ARRAY: " << "\n";
     for (int j = 0; j < cols; j++) 
-        std::cout << arr[j] << " ";
+        std::cout << arr[j] << " | ";
     std::cout << std::endl;
 }
 
@@ -23,7 +24,7 @@ void printArray(int *arr, int cols)
 {
     std::cout << "ARRAY: " << "\n";
     for (int j = 0; j < cols; j++) 
-        std::cout << arr[j] << " ";
+        std::cout << arr[j] << " | ";
     std::cout << std::endl;
 }
 
@@ -276,7 +277,9 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
     }    
     
     std::cout << "Xn values" << std::endl;
-    printArray(output, n);
+    for(int i=0; i<n; i++)
+        std::cout << "Xn" << i+1 << ":" << output[i] << "\n";
+    
 
     delete scaleFactor;
     delete order;
