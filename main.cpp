@@ -208,10 +208,10 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
         order[i] = i;
     }
 
-    std::cout << "\nInitial -- " << std::endl;
+    std::cout << "\n" << " --Initial Coefficients and B-Array-- " << "\n";
     printMatrix(matrix, n,n);
     printArray(bmatrix, n);
-    std::cout << "Initial -- \n " << std::endl;
+    std::cout << std::endl;
     //SETUP DONE
 
     int j=0;
@@ -222,9 +222,10 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
             sMax = std::max(sMax,  std::abs(matrix[i][j]));
         scaleFactor[i] = sMax;
     }
-    std::cout << "Scale Factor -- " << std::endl;
+
+    std::cout << "\n" << " -- Scale Factors -- " << "\n";
     printArray(scaleFactor, n);
-    std::cout << "Scale Factor -- \n " << std::endl;
+    std::cout << std::endl;
 
     for(int k=0; k < n-1; k++)
     {
