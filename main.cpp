@@ -242,7 +242,7 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
         }
 
         int temp = order[j];
-        int temp2 = order[k];
+        //int temp2 = order[k];
         order[j] = order[k];
         order[k] = temp;
 
@@ -256,8 +256,8 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
             matrix[ order[i] ][k] = xMultiplier;
             // It is assumed that matrix[order[i]][k] will be zeroed out by equation subtraction. So calculations are skiped.
 
-            for(j=k+1; j<n; j++)
-                matrix[ order[i] ][j] = matrix[ order[i] ][j] - (xMultiplier * matrix[ order[k] ][j]);
+            for(int z=k+1; z<n; z++)
+                matrix[ order[i] ][z] = matrix[ order[i] ][z] - (xMultiplier * matrix[ order[k] ][z]);
         }
 
         std::cout << "Matrix during step k=" << k << "\n";
