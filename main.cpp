@@ -1,45 +1,6 @@
 
 #include "main.hpp"
 
-void printMatrix(float **matrix, int rows, int cols) 
-{
-    std::cout << "Matrix: " << "\n";
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) 
-            std::cout << matrix[i][j] << " | ";
-        std::cout << "\n";
-    }
-    std::cout << std::endl;
-}
-
-template <class T>
-void printArray(T *arr, int cols) 
-{
-    std::cout << "ARRAY: " << "\n";
-    for (int j = 0; j < cols; j++) 
-        std::cout << arr[j] << " | ";
-    std::cout << std::endl;
-}
-
-bool isPureNumber(const std::string str)
-{
-    for(int i = 0; i < str.length(); i++ )
-    {
-        char c = str.at(i);
-        if(c < 48 || c >57)
-            return false;
-    }
-        
-    return true;
-}
-
-bool isNegativeNumber(const std::string str)
-{
-    if(str.empty())
-        return false;
-    return (str[0] == '-') && (str.find_first_not_of("1234567890", 1) == std::string::npos);
-}
-
 int getUserEquationCount()
 {
     int stringnum = 0;
@@ -59,11 +20,6 @@ int getUserEquationCount()
     return stringnum;
 }
 
-bool stringIsValid(std::string str)
-{
-    return true;
-}
-
 std::pair< std::vector<std::string>, int> manualRows()
 {
     std::vector<std::string> stringArray;
@@ -76,9 +32,12 @@ std::pair< std::vector<std::string>, int> manualRows()
         std::string in;
         std::getline(std::cin, in, '\n');
         if(!stringIsValid(in))
-            exit(1);
+        {
+            std::cout << "INVALID INPUT!!";
+            i--;
+            continue;
+        }
         stringArray.push_back(in);
-        
     }
 
     return std::pair(stringArray, rows);
@@ -93,25 +52,27 @@ std::pair< std::vector<std::string>, int> fromFile()
     std::getline(std::cin, input, '\n');
 
     std::ifstream inputFile(input);
-
-    if(inputFile.is_open())
+    if( !inputFile.is_open() )
     {
-        std::string activeString;
-        int i = 0;
-        while(inputFile.peek() != EOF)
-        {
-            std::getline(inputFile, activeString);
-            if(!stringIsValid(activeString))
-                exit(1);
-            stringArray.push_back(activeString);
-            i++;
-        }
-        inputFile.close();
-
-        return std::pair(stringArray, i);
+        std::cout << "Failed To open file: " << input << std::endl;
+        exit(1);
     }
-    std::cout << "Failed To open file: " << input << std::endl;
-    exit(1);
+
+    std::string activeString;
+    int i = 0;
+    while(inputFile.peek() != EOF)
+    {
+        std::getline(inputFile, activeString);
+        if(!stringIsValid(activeString))
+        {
+            std::cout << "invalid line at line#: " << i+1 << std::endl;
+            exit(1);
+        }
+        stringArray.push_back(activeString);
+        i++;
+    }
+    inputFile.close();
+    return std::pair(stringArray, i);
 }
 
 std::pair< std::vector<std::string>, int> getUserInput()
@@ -135,24 +96,25 @@ std::pair< std::vector<std::string>, int> getUserInput()
         return manualRows();
     else
         return fromFile();
-
 }
 
-std::vector<std::string> splitString(const std::string& str)
+bool isPureNumber(const std::string str)
 {
-    std::istringstream stream(str);
-    std::vector<std::string> splits;
-
-    do
+    for(int i = 0; i < str.length(); i++ )
     {
-        std::string active;
-        stream >> active;
-        if(active != "")
-            splits.push_back(active);
-    } 
-    while (stream);
-    
-    return splits;
+        char c = str.at(i);
+        if(c < 48 || c >57)
+            return false;
+    }
+        
+    return true;
+}
+
+bool isNegativeNumber(const std::string str)
+{
+    if(str.empty())
+        return false;
+    return (str[0] == '-') && (str.find_first_not_of("1234567890", 1) == std::string::npos);
 }
 
 int setupCoeffiecientAndBMatrix(float** matrix, float* bmatrix, std::vector<std::string> stringArrays)
@@ -181,7 +143,51 @@ int setupCoeffiecientAndBMatrix(float** matrix, float* bmatrix, std::vector<std:
     return matrixLength;
 }
 
-//returned value must be deallocated by external source
+void printMatrix(float **matrix, int rows, int cols) 
+{
+    std::cout << "Matrix: " << "\n";
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) 
+            std::cout << matrix[i][j] << " | ";
+        std::cout << "\n";
+    }
+    std::cout << std::endl;
+}
+template <class T>
+void printArray(T *arr, int cols) 
+{
+    std::cout << "ARRAY: " << "\n";
+    for (int j = 0; j < cols; j++) 
+        std::cout << arr[j] << " | ";
+    std::cout << std::endl;
+}
+
+std::vector<std::string> splitString(const std::string& str)
+{
+    std::istringstream stream(str);
+    std::vector<std::string> splits;
+
+    do
+    {
+        std::string active;
+        stream >> active;
+        if(active != "")
+            splits.push_back(active);
+    } 
+    while (stream);
+    
+    return splits;
+}
+
+bool stringIsValid(std::string str)
+{
+    std::vector<std::string> parts = splitString(str);
+    for (int i = 0; i < parts.size(); i++)
+        if( !(isPureNumber(parts[i]) || isNegativeNumber(parts[i])) )
+            return false;   
+    return true;
+}
+
 float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
 {
     float xMultiplier = 0;
@@ -191,8 +197,8 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
     int n = mLength;
 
     float *scaleFactor = new float[n];
-    int *order = new int[n];
     float *output = new float[n];
+    int *order = new int[n];
 
     for(int i=0; i<n; i++)
     {
@@ -205,19 +211,18 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
     printMatrix(matrix, n,n);
     printArray<float>(bmatrix, n);
     std::cout << std::endl;
-    //SETUP DONE
 
     int j=0;
     for(int i=0; i<n; i++)
     {
         sMax = 0;
         for(j=0; j<n; j++)
-            sMax = std::max(sMax,  std::abs(matrix[i][j]));
+            sMax = std::max( sMax,  std::abs(matrix[i][j]) );
         scaleFactor[i] = sMax;
     }
-    std::cout << "Scale Factor -- " << std::endl;
+    std::cout << "\n" << " -- Scale Factors -- " << "\n";
     printArray<float>(scaleFactor, n);
-    std::cout << "Scale Factor -- \n " << std::endl;
+    std::cout << std::endl;
 
     for(int k=0; k < n-1; k++)
     {
@@ -225,6 +230,9 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
         for(int i=k; i<n; i++)
         {
             r =  std::abs(matrix[ order[i] ][k] / scaleFactor[order[i]]);
+
+            std::cout << "Scale Ratio of Equation#" << order[i]+1 << " : " << r << "\n";
+
             if (r > rMax)
             {
                 rMax = r;
@@ -236,6 +244,9 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
         order[j] = order[k];
         order[k] = temp;
 
+        std::cout << "Using EQ#" << j+1 << " Has Ratio: " << rMax << " \n";
+        std::cout << std::endl;
+
         for(int i=k+1; i<n; i++)
         {
             xMultiplier = matrix[ order[i] ][k] / matrix[ order[k] ][k];
@@ -245,11 +256,13 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
             for(j=k+1; j<n; j++)
                 matrix[ order[i] ][j] = matrix[ order[i] ][j] - (xMultiplier * matrix[ order[k] ][j]);
         }
-        std::cout << "Matrix during step k=" << k << std::endl;
+
+        std::cout << "Matrix during step k=" << k << "\n";
         printMatrix(matrix, n,n);
-        std::cout << "ORDER during step k=" << k << std::endl;
+        std::cout << "ORDER ";
         printArray<int>(order, n);
-        std::cout << " -- \n" << std::endl;
+        std::cout << std::endl;
+
     }
 
     // BMatrix
@@ -266,17 +279,14 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
             sum = sum - matrix[order[i]][k] * output[k];
         
         output[i] = sum / matrix[order[i]][i];
-
     }    
     
-    std::cout << "Xn values" << std::endl;
+    std::cout << " -- Xn values -- " << "\n";
     for(int i=0; i<n; i++)
-        std::cout << "Xn" << i+1 << ":" << output[i] << "\n";
-    
+        std::cout << "Xn" << i+1 << " : " << output[i] << "\n";
 
     delete scaleFactor;
     delete order;
-
     return output;
 }
 
@@ -297,6 +307,5 @@ int main(int charc, char** charv)
     delete coeffiecientMatrix;
     delete solveValues;
     delete outputs;
-    
 }
 
