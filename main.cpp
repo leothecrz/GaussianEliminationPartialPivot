@@ -20,7 +20,7 @@ int getUserEquationCount()
     return stringnum;
 }
 
-std::pair< std::vector<std::string>, int> manualRows()
+std::vector<std::string> manualRows()
 {
     std::vector<std::string> stringArray;
 
@@ -40,10 +40,10 @@ std::pair< std::vector<std::string>, int> manualRows()
         stringArray.push_back(in);
     }
 
-    return std::pair(stringArray, rows);
+    return stringArray;
 }
 
-std::pair< std::vector<std::string>, int> fromFile()
+std::vector<std::string> fromFile()
 {
 
     std::vector<std::string> stringArray;
@@ -72,10 +72,11 @@ std::pair< std::vector<std::string>, int> fromFile()
         i++;
     }
     inputFile.close();
-    return std::pair(stringArray, i);
+    
+    return stringArray;
 }
 
-std::pair< std::vector<std::string>, int> getUserInput()
+std::vector<std::string> getUserInput()
 {
     int val = -1;
     std::string input;
@@ -293,14 +294,13 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
 int main(int charc, char** charv)
 {
     //int equationCount = getUserEquationCount();
-    std::pair< std::vector<std::string>, int>  returnVals =  getUserInput();
-    int equationCount = returnVals.second;
+    std::vector<std::string>  returnVals =  getUserInput();
+    int equationCount = returnVals.size();
 
     float **coeffiecientMatrix = new float* [equationCount];
     float *solveValues = new float[equationCount];
-    int matrixLength = setupCoeffiecientAndBMatrix(coeffiecientMatrix, solveValues, returnVals.first);
-
-    float* outputs = gaussAndSolve(coeffiecientMatrix, solveValues, equationCount);
+    int matrixLength = setupCoeffiecientAndBMatrix(coeffiecientMatrix, solveValues, returnVals);
+    float* outputs = gaussAndSolve(coeffiecientMatrix, solveValues, matrixLength);
 
     for(int i=0; i<equationCount; i++)
         delete coeffiecientMatrix[i];

@@ -6,7 +6,69 @@
 #include <utility>
 
 /**
- * @brief Function to print a 2D matrix
+ * @brief This function prompts the user to enter the number of equations they will be inputting.
+ * It ensures that a valid positive integer is provided before returning it.
+ * 
+ * @return int - equation count
+ */
+int getUserEquationCount();
+
+/**
+ * @brief This function allows the user to manually input the coefficients of the equations.
+ * It calls getUserEquationCount() to determine the number of equations to input.
+ * It validates the input strings to ensure they contain valid numbers.
+ * 
+ * @return std::vector<std::string> - string vector of user input 
+ */
+std::vector<std::string> manualRows();
+
+/**
+ * @brief This function reads coefficients from a file specified by the user.
+ * It prompts the user to enter the file path and then attempts to open and read the file.
+ * It checks the validity of the lines read from the file.
+ * 
+ * @return std::vector<std::string> 
+ */
+std::vector<std::string> fromFile();
+
+/**
+ * @brief This function prompts the user to choose between manual input or input from a file.
+ * It returns the result of either manualRows() or fromFile() based on the user's choice.
+ * 
+ * @return std::vector<std::string> 
+ */
+std::vector<std::string> getUserInput();
+
+/**
+ * @brief This function checks if a string contains only numeric characters.
+ * 
+ * @param str - string to be checked
+ * @return true - a positive num
+ * @return false - NaN
+ */
+bool isPureNumber(const std::string str);
+
+/**
+ * @brief This function checks if a string represents a negative number.
+ * 
+ * @param str - string to be checked
+ * @return true - a negative num
+ * @return false - NaN
+ */
+bool isNegativeNumber(const std::string str);
+
+/**
+ * @brief This function extracts coefficients and constants from the input strings and populates the coefficient matrix and b-matrix.
+ * 
+ * @param matrix - Coefficient Matrix
+ * @param bmatrix - Results Array
+ * @param stringArrays - User INPUT VECTOR
+ * @return int 
+ */
+int setupCoeffiecientAndBMatrix(float** matrix, float* bmatrix, std::vector<std::string> stringArrays);
+
+/**
+ * @brief This function prints a matrix to the console.
  * 
  * @param matrix 
  * @param rows 
@@ -15,105 +77,51 @@
 void printMatrix(float **matrix, int rows, int cols) ;
 
 /**
- * @brief Function to print a 1D array of floats
+ * @brief This function is a template for printing an array.
  * 
+ * @tparam T 
  * @param arr 
  * @param cols 
  */
-void printArray(float *arr, int cols) ;
+template <class T>
+void printArray(T *arr, int cols) ;
 
 /**
- * @brief Function to print a 1D array of integers
+ * @brief This function splits a string into a vector of strings based on whitespace.
  * 
- * @param arr 
- * @param cols 
+ * @param str 
+ * @return std::vector<std::string> 
  */
-void printArray(int *arr, int cols) ;
+std::vector<std::string> splitString(const std::string& str);
 
 /**
- * @brief Function to check if a string contains only digits
+ * @brief This function checks if a string contains ONLY valid numeric values.
  * 
  * @param str 
  * @return true 
  * @return false 
  */
-bool isPureNumber(const std::string str) ;
+bool stringIsValid(std::string str);
 
 /**
- * @brief Function to check if a string represents a negative number
- * 
- * @param str 
- * @return true 
- * @return false 
- */
-bool isNegativeNumber(const std::string str) ;
-
-/**
- * @brief Function to get the number of equations from the user
- * 
- * @return int 
- */
-int getUserEquationCount() ; 
-
-/**
- * @brief Function to validate a string (not implemented)
-
- * 
- * @param str 
- * @return true 
- * @return false 
- */
-bool stringIsValid(std::string str) ;
-
-/**
- * @brief Function to get row coefficients manually from the user
- * 
- * @param rows 
- * @return std::vector<std::string> 
- */
-std::pair< std::vector<std::string>, int> manualRows() ; 
-
-/**
- * @brief Function to get row coefficients from a file
-
- * 
- * @param rows 
- * @return std::vector<std::string> 
- */
-std::pair< std::vector<std::string>, int> fromFile() ;
-
-/**
- * @brief Function to get user input for row coefficients
- * 
- * @param eCount 
- * @return std::pair< std::vector<std::string>, int> 
- */
-std::pair< std::vector<std::string>, int> getUserInput() ;
-
-/**
- * @brief Function to split a string into a vector of substrings
- * 
- * @param str 
- * @return std::vector<std::string> 
- */
-std::vector<std::string> splitString(const std::string& str) ;
-
-/**
- * @brief Function to set up coefficient and B matrices from string data
- * 
- * @param matrix 
- * @param bmatrix 
- * @param stringArrays 
- * @return int 
- */
-int setupCoeffiecientAndBMatrix(float** matrix, float* bmatrix, std::vector<std::string> stringArrays) ;
-
-/**
- * @brief Function to perform Gaussian elimination and solve the system
+ * @brief This function performs the Gaussian Elimination method to solve the system of linear equations.
  * 
  * @param matrix 
  * @param bmatrix 
  * @param mLength 
  * @return float* 
  */
-float* gaussAndSolve(float** matrix, float* bmatrix, int mLength) ;
+float* gaussAndSolve(float** matrix, float* bmatrix, int mLength);
+
+/**
+ * @brief This is the main entry point of the program.
+ * It gets the user's input or input from a file,
+ * sets up the coefficient matrix and b-matrix,
+ * solves the system,
+ * and then deallocates memory.
+ * @param charc 
+ * @param charv 
+ * @return int 
+ */
+int main(int charc, char** charv);
+
