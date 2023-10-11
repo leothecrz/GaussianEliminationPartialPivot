@@ -217,8 +217,8 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
     for(int i=0; i<n; i++)
     {
         sMax = 0;
-        for(j=0; j<n; j++)
-            sMax = std::max( sMax,  std::abs(matrix[i][j]) );
+        for(int z=0; z<n; z++)
+            sMax = std::max( sMax,  std::abs(matrix[i][z]) );
         scaleFactor[i] = sMax;
     }
     std::cout << "\n" << " -- Scale Factors -- " << "\n";
@@ -234,7 +234,7 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
 
             std::cout << "Scale Ratio of Equation#" << order[i]+1 << " : " << r << "\n";
 
-            if (r > rMax)
+            if (r >= rMax)
             {
                 rMax = r;
                 j = i;
@@ -242,10 +242,11 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
         }
 
         int temp = order[j];
+        int temp2 = order[k];
         order[j] = order[k];
         order[k] = temp;
 
-        std::cout << "Using EQ#" << j+1 << " Has Ratio: " << rMax << " \n";
+        std::cout << "Using EQ#" << order[k] + 1 << " Has Ratio: " << rMax << " \n";
         std::cout << std::endl;
 
         for(int i=k+1; i<n; i++)
@@ -253,6 +254,7 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
             xMultiplier = matrix[ order[i] ][k] / matrix[ order[k] ][k];
             
             matrix[ order[i] ][k] = xMultiplier;
+            // It is assumed that matrix[order[i]][k] will be zeroed out by equation subtraction. So calculations are skiped.
 
             for(j=k+1; j<n; j++)
                 matrix[ order[i] ][j] = matrix[ order[i] ][j] - (xMultiplier * matrix[ order[k] ][j]);
@@ -300,7 +302,7 @@ int main(int charc, char** charv)
     float **coeffiecientMatrix = new float* [equationCount];
     float *solveValues = new float[equationCount];
     int matrixLength = setupCoeffiecientAndBMatrix(coeffiecientMatrix, solveValues, returnVals);
-    float* outputs = gaussAndSolve(coeffiecientMatrix, solveValues, matrixLength);
+    float* outputs = gaussAndSolve(coeffiecientMatrix, solveValues, equationCount);
 
     for(int i=0; i<equationCount; i++)
         delete coeffiecientMatrix[i];
