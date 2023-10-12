@@ -227,7 +227,7 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
 
     for(int k=0; k < n-1; k++)
     {
-        rMax = 0;
+        rMax = -1;
         for(int i=k; i<n; i++)
         {
             r =  std::abs(matrix[ order[i] ][k] / scaleFactor[order[i]]);
