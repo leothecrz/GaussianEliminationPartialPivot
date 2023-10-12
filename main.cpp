@@ -234,7 +234,7 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
 
             std::cout << "Scale Ratio of Equation#" << order[i]+1 << " : " << r << "\n";
 
-            if (r >= rMax)
+            if (r > rMax)
             {
                 rMax = r;
                 j = i;
@@ -242,13 +242,15 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
         }
 
         int temp = order[j];
-        //int temp2 = order[k];
         order[j] = order[k];
         order[k] = temp;
 
         std::cout << "Using EQ#" << order[k] + 1 << " Has Ratio: " << rMax << " \n";
         std::cout << std::endl;
 
+        if(matrix[ order[k] ][k] == 0)
+                std::cout << "\n\n -- DIV BY ZERO -- \n\n" << std::endl;
+                
         for(int i=k+1; i<n; i++)
         {
             xMultiplier = matrix[ order[i] ][k] / matrix[ order[k] ][k];
@@ -295,7 +297,6 @@ float* gaussAndSolve(float** matrix, float* bmatrix, int mLength)
 
 int main(int charc, char** charv)
 {
-    //int equationCount = getUserEquationCount();
     std::vector<std::string>  returnVals =  getUserInput();
     int equationCount = returnVals.size();
 
